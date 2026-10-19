@@ -1,0 +1,209 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function currentUserEmail() {
+      return request.auth != null && 'email' in request.auth.token && request.auth.token.email != null
+        ? request.auth.token.email.lower()
+        : '';
+    }
+
+    function isOwner(email) {
+      return isAuthenticated() && currentUserEmail() != '' && currentUserEmail() == email.lower();
+    }
+
+    // Role detection: checks user document in /church_users/{email} or custom token claim
+    function getUserData() {
+      return get(/databases/$(database)/documents/church_users/$(currentUserEmail())).data;
+    }
+
+    function hasUserDoc() {
+      return isAuthenticated() && currentUserEmail() != '' &&
+        exists(/databases/$(database)/documents/church_users/$(currentUserEmail()));
+    }
+
+    function getUserRole() {
+      return ('role' in request.auth.token && request.auth.token.role != null)
+        ? request.auth.token.role
+        : (hasUserDoc() ? getUserData().role : '');
+    }
+
+    function isManagerOrAdmin() {
+      return isAuthenticated() && (
+        ('admin' in request.auth.token && request.auth.token.admin == true) ||
+        getUserRole() == 'Manager' ||
+        getUserRole() == 'Super Admin' ||
+        getUserRole() == 'Admin' ||
+        getUserRole() == 'DeptAdmin'
+      );
+    }
+
+    function isTeacherOrStaff() {
+      return isAuthenticated() && (
+        isManagerOrAdmin() ||
+        getUserRole() == 'Teacher' ||
+        getUserRole() == 'Song Instructor'
+      );
+    }
+
+    // Validation functions
+    function isValidEmail(email) {
+      return email is string && email.size() >= 3 && email.size() <= 100;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 100;
+    }
+
+    function isValidChurchUser(data) {
+      return data.email is string && isValidEmail(data.email) &&
+        data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 100 &&
+        data.role is string &&
+        (!('phone' in data) || data.phone is string) &&
+        (!('departmentId' in data) || data.departmentId is number) &&
+        (!('isActive' in data) || data.isActive is bool) &&
+        (!('isApproved' in data) || data.isApproved is bool);
+    }
+
+    function isValidChurchMember(data) {
+      return data.memberId is string && isValidId(data.memberId) &&
+        data.fullName is string && data.fullName.size() >= 2 &&
+        (!('email' in data) || isValidEmail(data.email)) &&
+        (!('phone' in data) || data.phone is string) &&
+        (!('classGrade' in data) || data.classGrade is string);
+    }
+
+    function isValidChurchAttendance(data) {
+      return data.memberId is string && isValidId(data.memberId) &&
+        data.date is string && data.date.size() >= 4 &&
+        data.status is string;
+    }
+
+    function isValidChurchPayment(data) {
+      return data.paymentId is string && isValidId(data.paymentId) &&
+        data.memberId is string && isValidId(data.memberId) &&
+        data.amountPaid is number && data.amountPaid >= 0;
+    }
+
+    function isValidChurchGrade(data) {
+      return data.studentId is string && isValidId(data.studentId) &&
+        data.subject is string && data.subject.size() >= 2 &&
+        data.score is number && data.score >= 0;
+    }
+
+    function isValidChurchPlan(data) {
+      return data.title is string && data.title.size() >= 2 &&
+        data.departmentId is number;
+    }
+
+    function isValidChurchLesson(data) {
+      return data.lessonId is string && isValidId(data.lessonId) &&
+        data.title is string && data.title.size() >= 2 &&
+        data.subject is string && data.subject.size() >= 2 &&
+        data.summary is string && data.summary.size() >= 5;
+    }
+
+    // 1. Church Users Collection: Global user accounts & roles
+    match /church_users/{userEmail} {
+      // Admins and teachers can read all users; students & parents can only read their own user record
+      allow read: if isTeacherOrStaff() || isOwner(userEmail);
+      // Managers & Admins can write any user account and assign roles;
+      // Users can self-register or update their own profile without elevating their role/approval
+      allow create: if isManagerOrAdmin() || (isOwner(userEmail) && isValidChurchUser(request.resource.data));
+      allow update: if isManagerOrAdmin() || (
+        isOwner(userEmail) &&
+        isValidChurchUser(request.resource.data) &&
+        request.resource.data.role == resource.data.role &&
+        request.resource.data.isApproved == resource.data.isApproved
+      );
+      allow delete: if isManagerOrAdmin();
+    }
+
+    // 2. Church Members Collection: Sunday School students & members
+    match /church_members/{memberId} {
+      // Admins & Teachers can read all members; Students & Parents can only read their own record
+      allow read: if isTeacherOrStaff() || (
+        isAuthenticated() && (
+          ('email' in resource.data && resource.data.email != null && resource.data.email.lower() == currentUserEmail()) ||
+          ('memberId' in resource.data && resource.data.memberId != null && resource.data.memberId == request.auth.uid)
+        )
+      );
+      // Only Admins and Teachers have write permissions to manage members (or self-registration during member signup)
+      allow create: if isTeacherOrStaff() || (
+        isAuthenticated() &&
+        isValidChurchMember(request.resource.data) &&
+        'email' in request.resource.data &&
+        request.resource.data.email != null &&
+        request.resource.data.email.lower() == currentUserEmail()
+      );
+      allow update: if isTeacherOrStaff() && isValidChurchMember(request.resource.data);
+      allow delete: if isManagerOrAdmin();
+    }
+
+    // 3. Church Attendance Collection: Sunday school class attendance
+    match /church_attendance/{attendanceId} {
+      // Admins & Teachers can read all attendance; Students & Parents can only read their own attendance
+      allow read: if isTeacherOrStaff() || (
+        isAuthenticated() && (
+          ('email' in resource.data && resource.data.email != null && resource.data.email.lower() == currentUserEmail()) ||
+          ('memberId' in resource.data && resource.data.memberId != null && resource.data.memberId == request.auth.uid)
+        )
+      );
+      // Only Admins and Teachers have necessary write permissions
+      allow create, update: if isTeacherOrStaff() && isValidChurchAttendance(request.resource.data);
+      allow delete: if isManagerOrAdmin();
+    }
+
+    // 4. Church Payments Collection: Fees & contributions
+    match /church_payments/{paymentId} {
+      // Admins & Teachers/Finance can read all payments; Students & Parents can only read their own payments
+      allow read: if isTeacherOrStaff() || (
+        isAuthenticated() && (
+          ('email' in resource.data && resource.data.email != null && resource.data.email.lower() == currentUserEmail()) ||
+          ('memberId' in resource.data && resource.data.memberId != null && resource.data.memberId == request.auth.uid)
+        )
+      );
+      // Only Admins and Teachers/Finance staff have write permissions
+      allow create, update: if isTeacherOrStaff() && isValidChurchPayment(request.resource.data);
+      allow delete: if isManagerOrAdmin();
+    }
+
+    // 5. Church Grades Collection: Student marks and exam records
+    match /church_grades/{gradeId} {
+      // Admins & Teachers can read all grades; Students & Parents can only read their own grades
+      allow read: if isTeacherOrStaff() || (
+        isAuthenticated() && (
+          ('studentEmail' in resource.data && resource.data.studentEmail != null && resource.data.studentEmail.lower() == currentUserEmail()) ||
+          ('studentId' in resource.data && resource.data.studentId != null && resource.data.studentId == request.auth.uid)
+        )
+      );
+      // Only Admins and Teachers have necessary write permissions
+      allow create, update: if isTeacherOrStaff() && isValidChurchGrade(request.resource.data);
+      allow delete: if isManagerOrAdmin();
+    }
+
+    // 6. Church Plans Collection: Annual department plans
+    match /church_plans/{planId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isTeacherOrStaff() && isValidChurchPlan(request.resource.data);
+      allow delete: if isManagerOrAdmin();
+    }
+
+    // 7. Church Lessons Collection: Weekly lesson notes and summaries
+    match /church_lessons/{lessonId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isTeacherOrStaff() && isValidChurchLesson(request.resource.data);
+      allow delete: if isManagerOrAdmin();
+    }
+
+    // Default deny for unmapped documents
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

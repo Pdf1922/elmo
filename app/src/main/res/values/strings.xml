@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Meserete Hiwot</string>
+    <string name="church_name">Bole Arabsa Debre Hayil St. Gabriel &amp; St. Arsema Church</string>
+    <string name="system_title">Orthodox Sunday School Management System</string>
+
+    <!-- Navigation & Shell -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_classes">Classes &amp; Grades</string>
+    <string name="nav_grades">Grade Portal</string>
+    <string name="nav_attendance">Attendance</string>
+    <string name="nav_lesson_notes">Lesson Notes</string>
+    <string name="nav_finance">Finance</string>
+    <string name="nav_bible_study">Bible &amp; Hymns</string>
+    <string name="nav_counselor">Spiritual Counselor</string>
+    <string name="nav_data_center">Data Center</string>
+    <string name="nav_members">Members</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_announcements">Announcements</string>
+
+    <!-- Roles -->
+    <string name="role_student">Student</string>
+    <string name="role_teacher">Teacher</string>
+    <string name="role_admin">Admin</string>
+    <string name="role_parent">Parent</string>
+    <string name="role_manager">Manager</string>
+
+    <!-- Authentication & Localization -->
+    <string name="login">Log In</string>
+    <string name="register">Register</string>
+    <string name="logout">Log Out</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="switch_language">Language / ቋንቋ</string>
+    <string name="language_amharic">አማርኛ (Amharic)</string>
+    <string name="language_english">English</string>
+    <string name="current_language_label">Language: English</string>
+
+    <!-- Feature Actions & Status -->
+    <string name="welcome_back">Welcome back</string>
+    <string name="my_attendance">My Attendance</string>
+    <string name="my_grades">My Report Cards</string>
+    <string name="my_payments">My Contributions</string>
+    <string name="record_attendance">Record Attendance</string>
+    <string name="enter_marks">Enter Marks &amp; Grades</string>
+    <string name="cloud_sync">Firestore Cloud Sync</string>
+    <string name="security_audit">Security Audit</string>
+    <string name="all_departments">All Departments</string>
+    <string name="search">Search</string>
+    <string name="filter">Filter</string>
+    <string name="submit">Submit</string>
+    <string name="cancel">Cancel</string>
+    <string name="approved">Approved</string>
+    <string name="pending">Pending</string>
+</resources>

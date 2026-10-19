@@ -1,0 +1,6 @@
+{
+  "name": "Meserete Hiwot",
+  "description": "Bilingual Ethiopian Orthodox Sunday School Management System for Bole Arabsa Debre Hayil St. Gabriel and St. Arsema Church.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

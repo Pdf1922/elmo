@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Meserete Hiwot</string>
+    <string name="church_name">ቦሌ አረብሳ ደብረ ኃይል ቅዱስ ገብርኤል እና ቅድስት አርሴማ ቤተክርስቲያን</string>
+    <string name="system_title">የሰንበት ት/ቤት አስተዳደር ሥርዓት</string>
+
+    <!-- Navigation & Shell -->
+    <string name="nav_dashboard">ዳሽቦርድ</string>
+    <string name="nav_classes">ክፍሎችና ውጤቶች</string>
+    <string name="nav_grades">የውጤት መዝገብ</string>
+    <string name="nav_attendance">የአገልግሎት ክትትል</string>
+    <string name="nav_lesson_notes">የትምህርት ማስታወሻ</string>
+    <string name="nav_finance">ሒሳብና መዋጮ</string>
+    <string name="nav_bible_study">መጽሐፍ ቅዱስና ዜማ</string>
+    <string name="nav_counselor">መንፈሳዊ አማካሪ</string>
+    <string name="nav_data_center">የውሂብ ማዕከል</string>
+    <string name="nav_members">አባላትና ተማሪዎች</string>
+    <string name="nav_profile">የግል ገጽ</string>
+    <string name="nav_announcements">ማስታወቂያዎች</string>
+
+    <!-- Roles -->
+    <string name="role_student">ተማሪ</string>
+    <string name="role_teacher">መምህር</string>
+    <string name="role_admin">አስተዳዳሪ</string>
+    <string name="role_parent">ወላጅ</string>
+    <string name="role_manager">ሥራ አስኪያጅ</string>
+
+    <!-- Authentication & Localization -->
+    <string name="login">ግባ</string>
+    <string name="register">ተመዝገብ</string>
+    <string name="logout">ውጣ</string>
+    <string name="sign_in_with_google">በGoogle ይግቡ</string>
+    <string name="switch_language">ቋንቋ / Language</string>
+    <string name="language_amharic">አማርኛ</string>
+    <string name="language_english">English</string>
+    <string name="current_language_label">ቋንቋ: አማርኛ</string>
+
+    <!-- Feature Actions & Status -->
+    <string name="welcome_back">እንኳን ደህና መጡ</string>
+    <string name="my_attendance">የእኔ ክትትል</string>
+    <string name="my_grades">የውጤት ካርዴ</string>
+    <string name="my_payments">የእኔ መዋጮዎች</string>
+    <string name="record_attendance">ክትትል መዝግብ</string>
+    <string name="enter_marks">ውጤት አስገባ</string>
+    <string name="cloud_sync">የክላውድ ማመሳሰል</string>
+    <string name="security_audit">የደህንነት ኦዲት</string>
+    <string name="all_departments">ሁሉም ክፍሎች</string>
+    <string name="search">ፈልግ</string>
+    <string name="filter">አጣራ</string>
+    <string name="submit">አስገባ</string>
+    <string name="cancel">ይቅር</string>
+    <string name="approved">የጸደቀ</string>
+    <string name="pending">በመጠባበቅ ላይ</string>
+</resources>

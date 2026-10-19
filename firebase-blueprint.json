@@ -1,0 +1,159 @@
+{
+  "entities": {
+    "ChurchUser": {
+      "title": "ChurchUser",
+      "description": "User account for Sunday School Manager, Department Admin, Teacher, Parent or Student",
+      "type": "object",
+      "properties": {
+        "id": { "type": "number", "description": "Local ID mapping" },
+        "email": { "type": "string", "description": "Email address" },
+        "fullName": { "type": "string", "description": "Full name" },
+        "phone": { "type": "string", "description": "Phone number" },
+        "role": { "type": "string", "enum": ["Manager", "DeptAdmin", "Teacher", "Parent", "Member", "Student"] },
+        "departmentId": { "type": "number", "description": "Assigned department ID" },
+        "isActive": { "type": "boolean" },
+        "isApproved": { "type": "boolean" },
+        "approvalStatus": { "type": "string" },
+        "approvedBy": { "type": "string" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["email", "fullName", "role"]
+    },
+    "ChurchMember": {
+      "title": "ChurchMember",
+      "description": "Sunday School Student / Member registration record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "number" },
+        "memberId": { "type": "string" },
+        "fullName": { "type": "string" },
+        "gender": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "memberCategory": { "type": "string" },
+        "classGrade": { "type": "string" },
+        "departmentId": { "type": "number" },
+        "confessorFather": { "type": "string" },
+        "status": { "type": "string" },
+        "uniformAccessApproved": { "type": "boolean" }
+      },
+      "required": ["memberId", "fullName", "email"]
+    },
+    "ChurchAttendance": {
+      "title": "ChurchAttendance",
+      "description": "Sunday attendance record for students and choir members",
+      "type": "object",
+      "properties": {
+        "memberId": { "type": "string" },
+        "email": { "type": "string" },
+        "memberName": { "type": "string" },
+        "date": { "type": "string" },
+        "serviceType": { "type": "string" },
+        "status": { "type": "string" },
+        "recordedBy": { "type": "string" }
+      },
+      "required": ["memberId", "date", "status"]
+    },
+    "ChurchPayment": {
+      "title": "ChurchPayment",
+      "description": "Sunday school fee or monthly contribution ledger record",
+      "type": "object",
+      "properties": {
+        "paymentId": { "type": "string" },
+        "memberId": { "type": "string" },
+        "email": { "type": "string" },
+        "memberName": { "type": "string" },
+        "memberCategory": { "type": "string" },
+        "amountDue": { "type": "number" },
+        "amountPaid": { "type": "number" },
+        "paymentMonth": { "type": "string" },
+        "paymentYear": { "type": "number" },
+        "verified": { "type": "boolean" },
+        "verifiedBy": { "type": "string" },
+        "receiptNumber": { "type": "string" }
+      },
+      "required": ["paymentId", "memberId", "amountPaid"]
+    },
+    "ChurchGrade": {
+      "title": "ChurchGrade",
+      "description": "Student grade and exam marks recorded by teachers",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "studentEmail": { "type": "string" },
+        "studentName": { "type": "string" },
+        "subject": { "type": "string" },
+        "term": { "type": "string" },
+        "score": { "type": "number" },
+        "grade": { "type": "string" },
+        "teacherName": { "type": "string" },
+        "date": { "type": "string" }
+      },
+      "required": ["studentId", "subject", "score"]
+    },
+    "ChurchPlan": {
+      "title": "ChurchPlan",
+      "description": "Department action plan and budget",
+      "type": "object",
+      "properties": {
+        "id": { "type": "number" },
+        "title": { "type": "string" },
+        "departmentId": { "type": "number" },
+        "deptName": { "type": "string" },
+        "budget": { "type": "number" },
+        "status": { "type": "string" }
+      },
+      "required": ["title", "departmentId"]
+    },
+    "ChurchLesson": {
+      "title": "ChurchLesson",
+      "description": "Weekly Sunday school lesson notes and summaries posted by teachers",
+      "type": "object",
+      "properties": {
+        "lessonId": { "type": "string" },
+        "title": { "type": "string" },
+        "titleAmharic": { "type": "string" },
+        "subject": { "type": "string" },
+        "classGrade": { "type": "string" },
+        "weekNumber": { "type": "number" },
+        "datePosted": { "type": "string" },
+        "scriptureReference": { "type": "string" },
+        "summary": { "type": "string" },
+        "memoryVerse": { "type": "string" },
+        "teacherName": { "type": "string" },
+        "teacherEmail": { "type": "string" }
+      },
+      "required": ["lessonId", "title", "subject", "summary"]
+    }
+  },
+  "firestore": {
+    "/church_users/{email}": {
+      "schema": { "$ref": "#/entities/ChurchUser" },
+      "description": "Global synchronized Sunday School user accounts and roles"
+    },
+    "/church_members/{memberId}": {
+      "schema": { "$ref": "#/entities/ChurchMember" },
+      "description": "Synchronized Sunday School students and members"
+    },
+    "/church_attendance/{attendanceId}": {
+      "schema": { "$ref": "#/entities/ChurchAttendance" },
+      "description": "Sunday school class attendance records"
+    },
+    "/church_payments/{paymentId}": {
+      "schema": { "$ref": "#/entities/ChurchPayment" },
+      "description": "Synchronized contribution ledger records"
+    },
+    "/church_grades/{gradeId}": {
+      "schema": { "$ref": "#/entities/ChurchGrade" },
+      "description": "Student subject grades and exam marks"
+    },
+    "/church_lessons/{lessonId}": {
+      "schema": { "$ref": "#/entities/ChurchLesson" },
+      "description": "Weekly lesson summaries and study notes"
+    },
+    "/church_plans/{planId}": {
+      "schema": { "$ref": "#/entities/ChurchPlan" },
+      "description": "Department annual plans and budgets"
+    }
+  }
+}
